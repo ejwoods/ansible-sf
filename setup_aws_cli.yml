@@ -1,0 +1,18 @@
+# file: setup_aws_cli.yml
+---
+- hosts: all
+  tasks:
+  - name: Install package dependencies.
+    package: name={{ item }} state=present
+    with_items:
+      - python
+      - unzip
+  - name: Download the awscli bundle.
+    get_url: url=https://s3.amazonaws.com/aws-cli/awscli-bundle.zip dest=/tmp/awscli-bundle.zip
+    register: aws_cli_download_bundle
+  - name: Unzip the installer.
+    unarchive: src=/tmp/awscli-bundle.zip dest=/tmp copy=no creates=/tmp/awscli-bundle
+    when: aws_cli_download_bundle.changed
+  # Not working:
+  # - name: Install awscli package.
+  #   shell: sudo python /tmp/awscli-bundle/install
